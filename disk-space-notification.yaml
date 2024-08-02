@@ -14,7 +14,7 @@
     - name: Send Discord notification if disk usage is high
       when: disk_usage.stdout|int >= 75 and (disk_usage.rc == 0 or disk_usage.rc == 204)
       uri:
-        url: https://discord.com/api/webhooks/1154893277510770698/aqMPGP58pC6qBZ4tHe7yK8OQPBVXqDTo7o8RiiJmMC1h30zvMD2CP4X1sbsvuNyhMcv_
+        url: https://discord.com/api/webhooks/1236810931539939452/nu7eDOCmBBnzxNCERa1N6cxg5_TL9GxZd0BlDNRTScZOGSzigKCzBY8D2RnCBq5W97rJ
         method: POST
         body_format: json
         body: '{"content": "Server {{ server_name }} - disk usage is at {{ disk_usage.stdout }}%"}'
