@@ -1,0 +1,22 @@
+---
+- hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Get server name
+      set_fact:
+        server_name: "{{ ansible_hostname }}"
+
+    - name: Check disk usage
+      shell: df -hP / | awk 'NR==2{print $5}' | cut -d '%' -f1
+      register: disk_usage
+      changed_when: false
+
+    - name: Send Discord notification if disk usage is high
+      when: disk_usage.stdout|int >= 85 and (disk_usage.rc == 0 or disk_usage.rc == 204)
+      uri:
+        url: https://discord.com/api/webhooks/1154893277510770698/aqMPGP58pC6qBZ4tHe7yK8OQPBVXqDTo7o8RiiJmMC1h30zvMD2CP4X1sbsvuNyhMcv_
+        method: POST
+        body_format: json
+        body: '{"content": "Server {{ server_name }} - disk usage is at {{ disk_usage.stdout }}%"}'
+      delegate_to: localhost
+      ignore_errors: yes
