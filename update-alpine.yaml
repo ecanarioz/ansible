@@ -1,10 +1,16 @@
----
-- hosts: all
-  become: yes
+- name: Upgrade Alpine Linux Hosts
+  hosts: all
+  become: yes  # Run tasks as root
   tasks:
-    - name: Update apk packages
-      apk:
-        update_cache: yes
-        upgrade: yes
-      become_user: root
-#20231223
+    - name: Update package index
+      ansible.builtin.command: apk update
+      changed_when: false
+
+    - name: Upgrade all installed packages
+      ansible.builtin.command: apk upgrade --available
+      register: upgrade_result
+      changed_when: "'Upgrading' in upgrade_result.stdout"
+
+    - name: Clean up package cache
+      ansible.builtin.command: apk cache clean
+      changed_when: false
