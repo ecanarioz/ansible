@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Update apk packages
+      apk:
+        update_cache: yes
+        upgrade: yes
+      become_user: root
+#20231223
