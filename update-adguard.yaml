@@ -1,0 +1,41 @@
+---
+- name: Update AdGuard Home
+  hosts: all
+  become: yes
+  tasks:
+    - name: Download the latest AdGuard Home binary
+      get_url:
+        url: https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz
+        dest: /tmp/adguardhome_latest.tar.gz
+
+    - name: Stop AdGuard Home service
+      systemd:
+        name: AdGuardHome
+        state: stopped
+      ignore_errors: yes
+
+    - name: Extract the AdGuard Home binary
+      ansible.builtin.unarchive:
+        src: /tmp/adguardhome_latest.tar.gz
+        dest: /opt
+        remote_src: yes
+        extra_opts: [--strip-components=1]
+
+    - name: Ensure AdGuard Home is executable
+      ansible.builtin.file:
+        path: /opt/AdGuardHome
+        mode: 'u+x,g+x'
+
+    - name: Start AdGuard Home service
+      systemd:
+        name: AdGuardHome
+        state: started
+        #register: result
+
+    # - name: Send Gotify Message
+    #   ansible.builtin.uri:
+    #     url: "https://gotify.gersoncruz.com/message?token=AdsDrTwVJ2SbWzc"
+    #     method: POST
+    #     body_format: json
+    #     body: "{{ {'title': 'AdGuard Upgrade Error', 'message': 'Please Validate Configuration on: ' + ansible_hostname } | to_json }}"
+    #   when: result.failed
